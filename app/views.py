@@ -46,25 +46,24 @@ def login():
             # passed to the login_user() method below.
 
             # get user id, load into session
-            user = UserProfile.query.filter_by(username=username).first()
+        user = UserProfile.query.filter_by(username=username).first()
 
-            login_user(user)
-            if user is not None and check_password_hash(user.password, password):
-                remember_me = False
+        login_user(user)
+        if user is not None and check_password_hash(user.password, password):
+            remember_me = False
 
-            if 'remember_me' in request.form:
-                remember_me = True
-                
+        if 'remember_me' in request.form:
+            remember_me = True
             login_user(user, remember=remember_me)
 
             # remember to flash a message to the user
-            flash('Successfully logged in.', 'success')
-
-            return redirect(url_for("secure-page"))  # they should be redirected to a secure-page route instead
+        flash('Successfully logged in.', 'success')
+            
+        return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
     return render_template("login.html", form=form)
 
 
-@app.route('/secure-page')
+@app.route('/secure_page')
 @login_required
 def secure_page():
     """Renders the page after a successful login."""
