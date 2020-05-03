@@ -29,16 +29,28 @@ def about():
     return render_template('about.html')
 
 
+@app.route('/secure_page')
+@login_required
+def secure_page():
+    """Renders the page after a successful login."""
+    return render_template('secure_page.html')
+
+
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     form = LoginForm()
-    if request.method == "POST" and form.validate_on_submit():
-        # change this to actually validate the entire form submission
-        # and not just one field
-        username = form.username.data
-        password = form.password.data
+    if request.method == "POST" and form.validate_on_submit() and form.validate_on_submit():
+        
+        if form.username.data:
             # Get the username and password values from the form.
-
+            username = form.username.data
+            password = form.password.data
+            
+            user = UserProfile.query.filter_by(username=username).first()
+            
+            if check_password_hash(user.password, password):
+                
             # using your model, query database for a user based on the username
             # and password submitted. Remember you need to compare the password hash.
             # You will need to import the appropriate function to do so.
@@ -46,28 +58,14 @@ def login():
             # passed to the login_user() method below.
 
             # get user id, load into session
-        user = UserProfile.query.filter_by(username=username).first()
-
-        login_user(user)
-        if user is not None and check_password_hash(user.password, password):
-            remember_me = False
-
-        if 'remember_me' in request.form:
-            remember_me = True
-            login_user(user, remember=remember_me)
+            
+                login_user(user)
 
             # remember to flash a message to the user
-        flash('Successfully logged in.', 'success')
+            flash('Logged in successfully.')
             
-        return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
-    return render_template("login.html", form=form)
-
-
-@app.route('/secure_page')
-@login_required
-def secure_page():
-    """Renders the page after a successful login."""
-    return render_template('secure_page.html')
+            return redirect(url_for("secure_page"))  # they should be redirected to a secure-page route instead
+        return render_template("login.html", form=form)
 
 @app.route('/logout')
 @login_required
